@@ -1,10 +1,10 @@
-package com.digitechfp.curso_ad.sb1.model;
+package com.digitechfp.curso_ad.sb1.model.entities;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -27,7 +27,7 @@ public class Book {
     private String description;
 
     @Column(name = "author")
-    private String author;
+    private String author_delete;
 
     @Column(name = "publisher")
     private String publisher;
@@ -38,8 +38,11 @@ public class Book {
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Column(name = "publish_date", nullable = true)
-    private Date publishDate;
+    @Column(name = "publish_date")
+    private LocalDate publishDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id")
+    private Author author;
 
 }

@@ -1,8 +1,9 @@
 package com.digitechfp.curso_ad.sb1.controllers;
 
-import com.digitechfp.curso_ad.sb1.model.Book;
+import com.digitechfp.curso_ad.sb1.mapper.BookMapper;
 import com.digitechfp.curso_ad.sb1.model.daos.IBookDAO;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.digitechfp.curso_ad.sb1.model.dtos.BookDTO;
+import com.digitechfp.curso_ad.sb1.model.entities.Book;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,15 +13,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/books")
 public class BookController {
-    @Autowired
+    final
     IBookDAO bookDAO;
+
+    public BookController(IBookDAO bookDAO) {
+        this.bookDAO = bookDAO;
+    }
     // This class will handle HTTP requests related to books
     // You can define methods here to handle different endpoints
     // For example, to get all books, add a method like this:
 
     @GetMapping
-    public List<Book> getAllBooks() {
-         return (List<Book>) this.bookDAO.findAll();
+    public List<BookDTO> getAllBooks() {
+         List<Book> books = (List<Book>) this.bookDAO.findAll();
+         return BookMapper.toBookDTOList(books);
     }
 
     // You can also add methods for creating, updating, and deleting books

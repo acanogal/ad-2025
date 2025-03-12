@@ -1,6 +1,6 @@
 package com.digitechfp.curso_ad.sb1.model.daos;
 
-import com.digitechfp.curso_ad.sb1.model.Book;
+import com.digitechfp.curso_ad.sb1.model.entities.Book;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
@@ -12,8 +12,5 @@ public interface IBookDAO extends CrudRepository<Book, Long> {
     // For example, to find books by title:
     List<Book> findByTitle(String title);
     // Or to find books by author:
-    List<Book> findByAuthor(String author);
-    // Or to find books by genre:
-    // List<Book> findByGenre(String genre);
 
 }
