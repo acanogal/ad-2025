@@ -8,19 +8,25 @@ public class App {
     private static final String PASSWORD = "postgres";
     private static final String URL_FULL = "jdbc:postgresql://localhost:15432/postgres?user=postgres&password=postgres";
     public static void main(String[] args) throws SQLException {
+        Migration migration = new Migration();
+        try {
+            migration.execute();
+        } catch (SQLException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
         Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
         System.out.println(conn.isValid(0));
         Connection conn2 = DriverManager.getConnection(URL_FULL);
         System.out.println(conn2.isValid(0));
-        SelectBooks(conn2, "Select Books conn2");
+        selectBooks(conn2, "Select Books conn2");
         conn.setAutoCommit(false);
-        try (PreparedStatement insert = InsertBookStatement(conn)) {
-            InsertBook (insert, "El Señor de los Anillos", "J.R.R. Tolkien");
-            InsertBook (insert, "El Hobbit", "J.R.R. Tolkien");
-            InsertBook (insert, "El Silmarillion", "J.R.R. Tolkien");
-            SelectBooks (conn, "Select Books conn after insert");
-            SelectBooks (conn2, "Select Books conn2 after insert");
-            InsertBook (insert, null,null);
+        try (PreparedStatement insert = insertBookStatement(conn)) {
+            insertBook (insert, "El Señor de los Anillos", "J.R.R. Tolkien");
+            insertBook (insert, "El Hobbit", "J.R.R. Tolkien");
+            insertBook (insert, "El Silmarillion", "J.R.R. Tolkien");
+            selectBooks (conn, "Select Books conn after insert");
+            selectBooks (conn2, "Select Books conn2 after insert");
+            insertBook (insert, null,null);
             conn.commit();
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -28,11 +34,11 @@ public class App {
 /*        } finally {
             insert.close();*/
         }
-        SelectBooks(conn, "Select Books conn after rollback");
+        selectBooks(conn, "Select Books conn after rollback");
         conn.close();
     }
 
-    public static void SelectBooks (Connection conn, String msg) throws SQLException {
+    public static void selectBooks (Connection conn, String msg) throws SQLException {
         final String SELECT = "SELECT * FROM books";
         PreparedStatement st = conn.prepareStatement(SELECT);
         ResultSet rs = st.executeQuery();
@@ -42,11 +48,11 @@ public class App {
         }
     }
 
-    public static PreparedStatement InsertBookStatement (Connection conn) throws SQLException {
+    public static PreparedStatement insertBookStatement (Connection conn) throws SQLException {
         final String INSERT = "INSERT INTO books (title, author) VALUES (?, ?)";
         return conn.prepareStatement(INSERT);
     }
-    public static void InsertBook (PreparedStatement st, String title, String author) throws SQLException {
+    public static void insertBook (PreparedStatement st, String title, String author) throws SQLException {
         st.setString(1, title);
         st.setString(2, author);
         st.executeUpdate();
