@@ -59,6 +59,7 @@ public class DbConnection {
         List<Integer> ids = new ArrayList<>();
         while (rs.next()) {
             int id = rs.getInt(1);
+            ids.add(id);
             System.out.println("ID: " + id);
         }
         return ids;
@@ -71,4 +72,5 @@ public class DbConnection {
         }
         return null;
     }
+    // INSERT INTO AUTHOR (NAME) VALUES SELECT DISTINCT AUTHOR FROM BOOKS WHERE AUTHOR IS NOT NULL;
 }

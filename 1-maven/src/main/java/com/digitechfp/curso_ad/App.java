@@ -8,6 +8,7 @@ public class App {
     private static final String PASSWORD = "postgres";
     private static final String URL_FULL = "jdbc:postgresql://localhost:15432/postgres?user=postgres&password=postgres";
     public static void main(String[] args) throws SQLException {
+        DbConnection.instance().getConnection(URL, USER, PASSWORD).setAutoCommit(false);
         Migration migration = new Migration();
         try {
             migration.execute();

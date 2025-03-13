@@ -8,13 +8,13 @@ import java.util.List;
 public class Migration {
 
     private final DbConnection db;
-    private final PreparedStatement checkBook;
+    private final PreparedStatement existAuthor;
     private final PreparedStatement insertAuthor;
     private final PreparedStatement updateBook;
 
     public Migration() throws SQLException {
         this.db = DbConnection.instance();
-        this.checkBook = db.createStatement("SELECT ID FROM AUTHORS WHERE NAME = ?");
+        this.existAuthor = db.createStatement("SELECT ID FROM AUTHORS WHERE NAME = ?");
         this.insertAuthor = db.createStatementWithReturnID("INSERT INTO AUTHORS (NAME) VALUES (?)");
         this.updateBook = db.createStatement("UPDATE BOOKS SET AUTHOR_ID = ? WHERE ID = ?");
     }
@@ -24,8 +24,14 @@ public class Migration {
         try (ResultSet rs = db.select("SELECT * FROM BOOKS WHERE AUTHOR_ID IS NULL")) {
             while (rs.next()) {
                 System.out.println("Migration of "+rs.getString("TITLE"));
-                migrateBook(rs);
-
+                try {
+                    migrateBook(rs);
+                    db.getConnection().commit();
+                } catch (SQLException e) {
+                    System.out.println("Error: " + e.getMessage());
+                    db.getConnection().rollback();
+                    throw e;
+                }
             }
         } catch (SQLException e) {
             System.out.println("Error: " + e.getMessage());
@@ -36,8 +42,8 @@ public class Migration {
         System.out.println("Migration completed successfully.");
     }
     private void migrateBook(ResultSet rs) throws SQLException {
-        checkBook.setString(1, rs.getString("AUTHOR"));
-        Integer id = db.exist(checkBook, "id");
+        existAuthor.setString(1, rs.getString("AUTHOR"));
+        Integer id = db.exist(existAuthor, "id");
         List<Integer> ids;
         if (id == null) {
             insertAuthor.setString(1, rs.getString("AUTHOR"));
